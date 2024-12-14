@@ -1,90 +1,63 @@
 import React from 'react';
 import css from './ContactForm.module.css';
-import PropTypes from 'prop-types';
-import { nanoid } from 'nanoid';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
+import { getContacts } from '../../redux/selectors';
 
-class ContactForm extends React.Component {
-  static propTypes = {
-    addContact: PropTypes.func.isRequired,
-  };
+export const ContactForm = () => {
+  const dispatch = useDispatch();
 
-  constructor(props) {
-    super(props);
+  const contacts = useSelector(getContacts);
 
-    this.state = {
-      name: '', // state for <input name>
-      number: '', // state for <input number>
-    };
-  }
-
-  handleChange = event => {
-    const { name, value } = event.target;
-    this.setState({
-      [name]: value,
-    });
-  };
-
-  handleFormSubmit = event => {
+  const handleSubmitForm = event => {
     event.preventDefault();
-    const { name, number } = this.state;
-    const newContact = {
-      id: nanoid(),
-      name: name,
-      number: number,
-    };
+    const form = event.target;
+    const name = form.elements.name.value;
+    const number = form.elements.number.value;
 
-    if (this.props.addContact(newContact)) {
-      this.setState({
-        name: '',
-        number: '',
-      });
+    const contactExists = contacts.some(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (contactExists) {
+      alert(`${name} already in contacts.`);
     } else {
-      alert(`${name} is already in contacts.`);
+      dispatch(addContact({ name, number }));
     }
   };
 
-  render() {
-    const { name, number } = this.state;
-
-    return (
-      <div>
-        <form className={css.contactForm} onSubmit={this.handleFormSubmit}>
-          <label>
-            <p>Name</p>
-            <input
-              className={css.input}
-              type="text"
-              name="name"
-              pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan."
-              required
-              placeholder="Enter Full Name"
-              value={name}
-              onChange={this.handleChange}
-            />
-          </label>
-          <label>
-            <p>Number</p>
-            <input
-              className={css.input}
-              type="tel"
-              name="number"
-              pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-              required
-              placeholder="Enter Phone Number"
-              value={number}
-              onChange={this.handleChange}
-            />
-          </label>
-          <br />
-          <button type="submit" className={css.submitButton}>
-            Add Contact
-          </button>
-        </form>
-      </div>
-    );
-  }
-}
-
-export default ContactForm;
+  return (
+    <div>
+      <form className={css.contactForm} onSubmit={handleSubmitForm}>
+        <label>
+          <p>Name</p>
+          <input
+            className={css.input}
+            type="text"
+            name="name"
+            pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan."
+            required
+            placeholder="Enter Full Name"
+          />
+        </label>
+        <label>
+          <p>Number</p>
+          <input
+            className={css.input}
+            type="tel"
+            name="number"
+            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+            required
+            placeholder="Enter Phone Number"
+          />
+        </label>
+        <br />
+        <button type="submit" className={css.submitButton}>
+          Add Contact
+        </button>
+      </form>
+    </div>
+  );
+};

@@ -1,33 +1,24 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import css from './ContactList.module.css';
-import ContactListItem from '../ContactListItem/ContactListItem';
+import { ContactListItem } from '../ContactListItem/ContactListItem';
+import { useSelector } from 'react-redux';
+import { getContacts, getFilter } from '../../redux/selectors';
 
-class ContactList extends React.Component {
-  static propTypes = {
-    contacts: PropTypes.array.isRequired,
-    filter: PropTypes.string.isRequired,
-    deleteContact: PropTypes.func.isRequired,
-  };
+export const ContactList = () => {
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
 
-  render() {
-    const { contacts, filter, deleteContact } = this.props;
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
-    return (
-      <div>
-        <ul className={css.contactListContainer}>
-          {contacts.map(contact => (
-            <ContactListItem
-              key={contact.id}
-              contact={contact}
-              filter={filter}
-              deleteContact={deleteContact}
-            />
-          ))}
-        </ul>
-      </div>
-    );
-  }
-}
-
-export default ContactList;
+  return (
+    <div>
+      <ul className={css.contactListContainer}>
+        {filteredContacts.map(contact => (
+          <ContactListItem key={contact.id} contact={contact} />
+        ))}
+      </ul>
+    </div>
+  );
+};

@@ -1,29 +1,25 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import css from './ContactListItem.module.css';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from '../../redux/contactsSlice';
 
-class ContactListItem extends React.Component {
-  static propTypes = {
-    contact: PropTypes.object.isRequired,
-    filter: PropTypes.string.isRequired,
-    deleteContact: PropTypes.func.isRequired,
+export const ContactListItem = ({ contact }) => {
+  const { id, name, number } = contact;
+
+  const dispatch = useDispatch();
+
+  const handleDelete = contactId => {
+    dispatch(deleteContact(contactId));
   };
 
-  render() {
-    const { id, name, number } = this.props.contact;
-    const { deleteContact } = this.props;
-
-    return (
-      <li className={css.contactItem}>
-        <p>
-          {name}: {number}
-        </p>
-        <button type="button" onClick={() => deleteContact(id)}>
-          Delete
-        </button>
-      </li>
-    );
-  }
-}
-
-export default ContactListItem;
+  return (
+    <li className={css.contactItem}>
+      <p>
+        {name}: {number}
+      </p>
+      <button type="button" onClick={() => handleDelete(id)}>
+        Delete
+      </button>
+    </li>
+  );
+};
